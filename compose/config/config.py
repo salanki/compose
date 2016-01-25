@@ -74,6 +74,12 @@ DOCKER_CONFIG_KEYS = [
     'volumes',
     'volumes_from',
     'working_dir',
+    "tags",
+    "roles",
+    "target_num_containers",
+    "autodestroy",
+    "autoredeploy",
+    "deployment_strategy"
 ]
 
 ALLOWED_KEYS = DOCKER_CONFIG_KEYS + [
@@ -475,10 +481,6 @@ def resolve_build_args(build):
 def validate_extended_service_dict(service_dict, filename, service):
     error_prefix = "Cannot extend service '%s' in %s:" % (service, filename)
 
-    if 'links' in service_dict:
-        raise ConfigurationError(
-            "%s services with 'links' cannot be extended" % error_prefix)
-
     if 'volumes_from' in service_dict:
         raise ConfigurationError(
             "%s services with 'volumes_from' cannot be extended" % error_prefix)
@@ -559,9 +561,6 @@ def finalize_service(service_config, service_names, version):
         service_dict['volumes'] = [
             VolumeSpec.parse(v) for v in service_dict['volumes']]
 
-    if 'restart' in service_dict:
-        service_dict['restart'] = parse_restart_spec(service_dict['restart'])
-
     normalize_build(service_dict, service_config.working_dir)
 
     service_dict['name'] = service_config.name
@@ -623,7 +622,7 @@ def merge_service_dicts(base, override, version):
     for field in ['volumes', 'devices']:
         merge_field(field, merge_path_mappings)
 
-    for field in ['ports', 'expose', 'external_links']:
+    for field in ['ports', 'expose', 'external_links', 'tags']:
         merge_field(field, operator.add, default=[])
 
     for field in ['dns', 'dns_search', 'env_file']:

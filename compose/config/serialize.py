@@ -18,10 +18,7 @@ yaml.SafeDumper.add_representer(types.VolumeSpec, serialize_config_type)
 
 def serialize_config(config):
     output = {
-        'version': config.version,
-        'services': {service.pop('name'): service for service in config.services},
-        'networks': config.networks,
-        'volumes': config.volumes,
+		service.pop('name'): service for service in config.services
     }
     return yaml.safe_dump(
         output,
