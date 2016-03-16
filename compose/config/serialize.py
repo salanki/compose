@@ -18,16 +18,17 @@ yaml.SafeDumper.add_representer(types.VolumeFromSpec, serialize_config_type)
 yaml.SafeDumper.add_representer(types.VolumeSpec, serialize_config_type)
 
 
-def serialize_config(config):
-    output = {
-		service.pop('name'): service for service in config.services
+def denormalize_config(config):
+    return {
+        service.pop('name'): service for service in config.services
     }
+
+def serialize_config(config):
     return yaml.safe_dump(
-        output,
+        denormalize_config(config),
         default_flow_style=False,
         indent=2,
         width=80)
-
 
 def denormalize_service_dict(service_dict, version):
     service_dict = service_dict.copy()
